@@ -1,0 +1,15 @@
+service: telegram-lambdas
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+
+functions:
+  bot:
+    handler: handler.bot
+    events:
+      - http:
+          path: nodde-tg-bot
+          method: post     
