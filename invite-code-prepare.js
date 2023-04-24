@@ -1,6 +1,6 @@
 'use strict';
 
-import { telegramTable, unixTimestamp, BINDING_TYPE, INVITE_TYPE } from './common';
+import { telegramTable, unixTimestamp, BINDING_TYPE, INVITE_TYPE, COMMON_ERROR_MESSAGE, SUCCESS, ERROR, generateRandomCode } from './common';
 
 const AWS = require('aws-sdk');
 
@@ -14,13 +14,13 @@ module.exports.prepareInvite = async (event, context) => {
     let body = JSON.parse(event.body);
     let { address, content_id } = body;
 
-    try {
+    let result = await getTelegramChatByContentId(content_id);
 
-        let chat = await getTelegramChatByContentId(content_id);
+    if (result.status === SUCCESS && result.item) {
 
         let preparedInvite = {
             type: INVITE_TYPE,
-            code: code,
+            code: `inv${generateRandomCode()}`,
             address: address,
             content_id: content_id,
             chat_id: chat.chat_id,
@@ -28,28 +28,78 @@ module.exports.prepareInvite = async (event, context) => {
         };
 
 
-        await savePreparedInvite(preparedInvite);
+        let saved = await savePreparedInvite(preparedInvite);
 
-    } catch (e) {
-        console.error(e);
+        if (saved.status === SUCCESS) {
+            return {
+                statusCode: 200,
+                body: JSON.stringify({ code: preparedInvite.code })
+            }
+        } else {
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ message: COMMON_ERROR_MESSAGE })
+            }
+        }
     }
 
-}
-
-
-async function getTelegramChatByContentId(contentId) {
-    return await dynamo.get({
-        TableName: telegramTableName,
-        Key: { 
-            "type": BINDING_TYPE,
-            "content_id": contentId 
+    if (result.status === SUCCESS) {
+        return {
+            statusCode: 404,
+            body: JSON.stringify({ message: "Not found" })
         }
-    }).promise();
+    }
+
+    return {
+        statusCode: 500,
+        body: JSON.stringify({ message: COMMON_ERROR_MESSAGE })
+    }
 }
 
-async function savePreparedInvite(preparedInvite) {
-    return await dynamo.put({
+const getTelegramChatByContentId = async (contentId) => {
+
+    const params = {
         TableName: telegramTable,
-        Item: preparedInvite
-    }).promise()
+        Key: {
+            "type": BINDING_TYPE,
+            "content_id": contentId,
+        }
+    };
+
+    try {
+        const result = await dynamo.get(params).promise();
+        return {
+            status: "success",
+            item: result.Item
+        }
+    } catch (error) {
+        console.error(`Error when get chat by content id with params: ${params}`, error);
+        return {
+            status: "error",
+            message: COMMON_ERROR_MESSAGE,
+        }
+    }
+}
+
+
+const savePreparedInvite = async (preparedInvite) => {
+
+    const params = {
+        TableName: telegramTable,
+        Item: preparedInvite,
+    };
+
+    try {
+        await dynamo.put(params).promise()
+        return {
+            status: SUCCESS
+        }
+    } catch (error) {
+        console.error(`Error when save prepared invite to db with params: ${preparedInvite}`, error);
+        return {
+            status: ERROR,
+            message: COMMON_ERROR_MESSAGE,
+        }
+    }
+
 }
