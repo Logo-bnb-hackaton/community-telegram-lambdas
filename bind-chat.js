@@ -3,7 +3,7 @@
 const { COMMON_ERROR_MESSAGE, unixTimestamp, SUCCESS } = require('./common');
 const { getBindingByCode, saveBinding } = require('./repository');
 
-module.exports.bind = async (event, context) => {
+module.exports.bindChat = async (event, context) => {
 
     let body = JSON.parse(event.body);
     let { address, code, content_id } = body;

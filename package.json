@@ -10,7 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "aws-sdk": "^2.1363.0",
-    "ethers": "^6.3.0",
+    "ethers": "5.4",
     "node-telegram-bot-api": "^0.61.0",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",

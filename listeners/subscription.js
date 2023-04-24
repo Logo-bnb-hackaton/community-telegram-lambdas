@@ -7,6 +7,7 @@ const networkRpc = "https://data-seed-prebsc-1-s3.binance.org:8545";
 
 const startListenEventsFromSubscriptionContract = async () => {
     
+    console.log("Start listening new subscription events");
     
     let provider = new ethers.providers.JsonRpcProvider(networkRpc);
     

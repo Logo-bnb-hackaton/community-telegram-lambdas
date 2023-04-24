@@ -13,19 +13,21 @@ functions:
       - http:
           path: nodde-tg-bot
           method: post     
-  bind:
-    handler: bind.bind
+  bindChat:
+    handler: bind-chat.bindChat
     events:
       - http:
-          path: bind
+          path: bind-chat
           method: post        
   inviteCodePrepare:
     handler: invite-code-prepare.prepareInvite
     events:
       - http:
           path: prepare-invite
+          method: post
   inviteCodeGet:
     handler: invite-code-get.getInviteCode
     events:
       - http:
-          path: /get-invite-code    
+          path: get-invite-code    
+          method: get
