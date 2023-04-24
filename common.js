@@ -2,6 +2,9 @@
 
 export const telegramTable = "Community-telegram";
 
+export const BINDING_TYPE = "binding";
+export const INVITE_TYPE = "invite";
+
 export function unixTimestamp(date = Date.now()) {
     return Math.floor(date / 1000)
 }

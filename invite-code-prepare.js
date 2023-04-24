@@ -1,6 +1,6 @@
 'use strict';
 
-import { telegramTable, unixTimestamp } from './common';
+import { telegramTable, unixTimestamp, BINDING_TYPE, INVITE_TYPE } from './common';
 
 const AWS = require('aws-sdk');
 
@@ -19,7 +19,7 @@ module.exports.prepareInvite = async (event, context) => {
         let chat = await getTelegramChatByContentId(content_id);
 
         let preparedInvite = {
-            type: "invite",
+            type: INVITE_TYPE,
             code: code,
             address: address,
             content_id: content_id,
@@ -40,7 +40,10 @@ module.exports.prepareInvite = async (event, context) => {
 async function getTelegramChatByContentId(contentId) {
     return await dynamo.get({
         TableName: telegramTableName,
-        Key: { "content_id": contentId }
+        Key: { 
+            "type": BINDING_TYPE,
+            "content_id": contentId 
+        }
     }).promise();
 }
 
