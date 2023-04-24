@@ -1,13 +1,7 @@
 'use strict';
 
-import { telegramTable, unixTimestamp, BINDING_TYPE, INVITE_TYPE, COMMON_ERROR_MESSAGE, SUCCESS, ERROR, generateRandomCode } from './common';
-
-const AWS = require('aws-sdk');
-
-const region = "us-east-1";
-const telegramTableName = "Community-telegram";
-const dynamo = new AWS.DynamoDB.DocumentClient({ region: region });
-
+import { unixTimestamp, INVITE_TYPE, COMMON_ERROR_MESSAGE, SUCCESS, generateRandomCode } from './common';
+import { getTelegramChatByContentId, savePreparedInvite } from './repository';
 
 module.exports.prepareInvite = async (event, context) => {
 
@@ -54,52 +48,4 @@ module.exports.prepareInvite = async (event, context) => {
         statusCode: 500,
         body: JSON.stringify({ message: COMMON_ERROR_MESSAGE })
     }
-}
-
-const getTelegramChatByContentId = async (contentId) => {
-
-    const params = {
-        TableName: telegramTable,
-        Key: {
-            "type": BINDING_TYPE,
-            "content_id": contentId,
-        }
-    };
-
-    try {
-        const result = await dynamo.get(params).promise();
-        return {
-            status: "success",
-            item: result.Item
-        }
-    } catch (error) {
-        console.error(`Error when get chat by content id with params: ${params}`, error);
-        return {
-            status: "error",
-            message: COMMON_ERROR_MESSAGE,
-        }
-    }
-}
-
-
-const savePreparedInvite = async (preparedInvite) => {
-
-    const params = {
-        TableName: telegramTable,
-        Item: preparedInvite,
-    };
-
-    try {
-        await dynamo.put(params).promise()
-        return {
-            status: SUCCESS
-        }
-    } catch (error) {
-        console.error(`Error when save prepared invite to db with params: ${preparedInvite}`, error);
-        return {
-            status: ERROR,
-            message: COMMON_ERROR_MESSAGE,
-        }
-    }
-
 }

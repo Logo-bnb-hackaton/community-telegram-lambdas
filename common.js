@@ -2,6 +2,7 @@
 
 // DynamoDB tables
 export const telegramTable = "Community-telegram";
+export const telegramPrivateChatsTable = "Community-telegram-private-chats";
 
 export const BINDING_TYPE = "binding";
 export const INVITE_TYPE = "invite";
