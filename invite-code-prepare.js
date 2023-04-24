@@ -1,6 +1,6 @@
 'use strict';
 
-import { unixTimestamp } from './common';
+import { telegramTable, unixTimestamp } from './common';
 
 const AWS = require('aws-sdk');
 
@@ -9,33 +9,44 @@ const telegramTableName = "Community-telegram";
 const dynamo = new AWS.DynamoDB.DocumentClient({ region: region });
 
 
-module.exports.prepareInvite = (event, context) => {
-    
+module.exports.prepareInvite = async (event, context) => {
+
     let body = JSON.parse(event.body);
     let { address, content_id } = body;
 
-    let chat = getTelegramChatByContentId(content_id);
+    try {
 
-    let preparedInvite = {
-        type: "invite",
-        code: code,
-        address: address,
-        content_id: content_id,
-        chat_id: chat.chat_id,
-        created_at: unixTimestamp()
+        let chat = await getTelegramChatByContentId(content_id);
+
+        let preparedInvite = {
+            type: "invite",
+            code: code,
+            address: address,
+            content_id: content_id,
+            chat_id: chat.chat_id,
+            created_at: unixTimestamp()
+        };
+
+
+        await savePreparedInvite(preparedInvite);
+
+    } catch (e) {
+        console.error(e);
     }
 
-    savePreparedInvite(preparedInvite);
 }
 
 
 async function getTelegramChatByContentId(contentId) {
-    return dynamo.get({
+    return await dynamo.get({
         TableName: telegramTableName,
         Key: { "content_id": contentId }
-    }).promise().Item;
+    }).promise();
 }
 
 async function savePreparedInvite(preparedInvite) {
-    // TODO implement
+    return await dynamo.put({
+        TableName: telegramTable,
+        Item: preparedInvite
+    }).promise()
 }
