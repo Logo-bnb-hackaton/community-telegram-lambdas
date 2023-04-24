@@ -1,6 +1,9 @@
 'use strict';
 
+import { unixTimestamp, generateRandomCode } from './common';
+
 const AWS = require('aws-sdk')
+const crypto = require('crypto'); 
 const TelegramBot = require('node-telegram-bot-api');
 
 const token = process.env.TELEGRAM_TOKEN;
@@ -119,16 +122,32 @@ async function handleBindigingCode(message) {
 
 async function handleInviteCode(message) {
   let text = message.text;
-  let code = text.subsctring();
+  let code = text;
+
+  dynamo.getItem(
+    {
+      TableName: telegramTableName,
+      Key: {type: "invite", code: `inv${code}`}
+    },
+    function (err, data) {
+      if (err) {
+        console.error(err);
+      } else {
+        let invitation = data.Item;
+        let inviteLink = invitation.inviteLink;
+        if (invite_link) {
+
+        } else {
+
+        }
+      }
+    }
+  )
+
+  let respose = dynamo.get().promise().Item;
 }
 
-function generateRandomCode() {
 
-}
-
-function unixTimestamp(date = Date.now()) {
-  return Math.floor(date / 1000)
-}
 
 async function saveNewBindingCode(bindingCode) {
   dynamo.put({
