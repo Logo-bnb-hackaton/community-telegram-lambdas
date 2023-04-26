@@ -5,6 +5,28 @@ provider:
   name: aws
   runtime: nodejs12.x
   region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/Community-telegram"
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/Community-telegram-private-chats"
+
 
 functions:
   bot:
@@ -31,26 +53,3 @@ functions:
       - http:
           path: get-invite-code    
           method: get
-
-resources:
-  Resources:
-    communityTelegram:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: Community-telegram
-        KeySchema:
-          - AttributeName: code
-            KeyType: S
-        ProvisionedThroughput:
-          ReadCapacityUnits: 10
-          WriteCapacityUnits: 10    
-    communityTelegramPrivateChat:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: Community-telegram-private-chats
-        KeySchema:
-          - AttributeName: "user_id"
-            KeyType: S
-        ProvisionedThroughput:
-          ReadCapacityUnits: 10
-          WriteCapacityUnits: 10        

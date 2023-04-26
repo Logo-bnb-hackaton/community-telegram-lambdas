@@ -42,8 +42,8 @@ module.exports.getInviteInfoByContentIdAndAddress = async (contentId, address) =
         TableName: telegramTable,
         Key: {
             "type": INVITE_TYPE,
-            "content_id": contentId,
-            "address": address
+            "content_id": String(contentId),
+            "address": String(address)
         },
     };
 
@@ -56,7 +56,7 @@ module.exports.getTelegramChatByContentId = async (contentId) => {
         TableName: telegramTable,
         Key: {
             "type": BINDING_TYPE,
-            "content_id": contentId,
+            "content_id": String(contentId),
         }
     };
 
@@ -78,7 +78,7 @@ module.exports.getPrivateChatInfoByUserId = async (userId) => {
     let params = {
         TableName: telegramPrivateChatsTable,
         Key: {
-            "user_id": userId
+            "user_id": String(userId)
         }
     }
 
@@ -86,10 +86,10 @@ module.exports.getPrivateChatInfoByUserId = async (userId) => {
 }
 
 module.exports.saveNewBindingCode = async (bindingCode) => {
-
+ 
     let params = {
         TableName: telegramTable,
-        Item: newBinding,
+        Item: bindingCode,
     };
 
     return await save(params);
@@ -101,7 +101,7 @@ module.exports.getBindingByCode = async (code) => {
         TableName: telegramTable,
         Key: {
             "type": BINDING_TYPE,
-            "code": code,
+            "code": String(code),
         },
     };
 
@@ -124,7 +124,7 @@ module.exports.getInviteByCode = async (code) => {
         TableName: telegramTable,
         Key: {
             "type": INVITE_TYPE,
-            "code": code,
+            "code": String(code),
         }
     };
 

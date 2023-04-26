@@ -6,30 +6,35 @@ const { getInviteByCode, getPrivateChatInfoByUserId, saveInvite, saveNewBindingC
 const TelegramBot = require('node-telegram-bot-api');
 
 const token = '5594626655:AAHPrN4jgWeLNuoGsHomF__ggck1kSc4lfU';
+const username = 'sprut_signals_bot'
 const bot = new TelegramBot(token, { polling: false });
 
 const SOMETHING_WRONG_MESSAGE = "Hmm... Something went wrong. We are already fixing this."
 
 module.exports.bot = async (event, context) => {
 
-  let body = JSON.parse(event.body);
-  let message = body.message || body.edited_message;
+  try {
+    let body = JSON.parse(event.body);
+    let message = body.message || body.edited_message;
 
-  let chat = message.chat
-  let chatType = chat.type
+    let chat = message.chat
+    let chatType = chat.type
 
-  if (chatType === 'group') {
-    await handleGroupMessage(message);
-  } else if (chatType === 'private') {
-    await handlePrivateMessage(message);
+    if (chatType === 'group') {
+      await handleGroupMessage(message);
+    } else if (chatType === 'private') {
+      await handlePrivateMessage(message);
+    }
+  } catch (error) {
+    console.error("Error when receive webhook.",error);
   }
 
   return { statusCode: 200 };
 };
 
 async function handleGroupMessage(message) {
-  const text = message.text;
-  if ('@nodde bind' === text) {
+  let text = message.text;
+  if (`@${username} bind` === text) {
     await handleBindCommand(message);
   }
 }
@@ -43,7 +48,7 @@ async function handleBindCommand(message) {
 
   if (isAdmin) {
 
-    let privateChatInfo = await getPrivateChatInfoByUserId(userId);
+    let privateChatInfo = await getPrivateChatInfoByUserId(String(userId));
 
     if (privateChatInfo.status === ERROR) {
       await bot.sendMessage(chatId, SOMETHING_WRONG_MESSAGE);
@@ -58,9 +63,9 @@ async function handleBindCommand(message) {
     const newBinding = {
       type: "binding",
       code: `bind${generateRandomCode()}`,
-      chat_id: chatId,
+      chat_id: String(chatId),
       user_private_chat_id: privateChatInfo.chat_id,
-      user_id: userId,
+      user_id: String(userId),
       created_at: unixTimestamp()
     }
 
@@ -99,10 +104,10 @@ async function handleStartCommand(message) {
   let chatId = message.chat.id;
   let userId = message.from.id;
   console.log(`\\start command was invoked by user ${userId} in chat ${chatId}`);
-  
+
   let privateChatInfo = {
-    chat_id: chatId,
-    user_id: userId
+    chat_id: String(chatId),
+    user_id: String(userId)
   };
 
   let { status } = await savePrivateChat(privateChatInfo);
@@ -112,15 +117,15 @@ async function handleStartCommand(message) {
     await bot.sendMessage(chatId, "Hello! If you have binding or invintation code, please send it in the next message.");
   } else {
     await bot.sendMessage(chatId, SOMETHING_WRONG_MESSAGE)
-  }  
+  }
 }
 
 async function handleInviteCode(message) {
-  
+
   let text = message.text;
   let code = text; // TODO get subsctring and validate;
-  let privateChatId = message.chat.id;
-  let userId = message.from.id;
+  let privateChatId = String(message.chat.id);
+  let userId = String(message.from.id);
 
   let { status, item } = await getInviteByCode(code);
 
@@ -133,12 +138,12 @@ async function handleInviteCode(message) {
 
       let groupChatId = item.chat_id;
       let newInviteLink = await bot.createChatInviteLink(groupChatId, { member_limit: 1, creates_join_request: true });
-      
+
       invite.invite_link = newInviteLink;
       invite.updated_at = unixTimestamp();
-      invite.user_id = userId;
+      invite.user_id = String(userId);
       invite.invite_refresh_count = 0;
-      invite.user_private_chat_id = privateChatId;
+      invite.user_private_chat_id = String(privateChatId);
 
       let { status } = await saveInvite(invite);
 

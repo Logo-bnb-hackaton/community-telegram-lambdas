@@ -21,8 +21,8 @@ module.exports.bindChat = async (event, context) => {
             }
         }
 
-        binding.address = address;
-        binding.content_id = content_id;
+        binding.address = String(address);
+        binding.content_id = String(content_id);
         binding.updated_at = unixTimestamp();
 
         const saved = await saveBinding(binding);
