@@ -1,11 +1,11 @@
 'use strict';
 
-import { unixTimestamp, generateRandomCode, SUCCESS } from './common';
-import { getInviteByCode, getPrivateChatInfoByUserId, saveInvite, saveNewBindingCode, savePrivateChat } from './repository';
+const { unixTimestamp, generateRandomCode, SUCCESS, ERROR } = require('./common');
+const { getInviteByCode, getPrivateChatInfoByUserId, saveInvite, saveNewBindingCode, savePrivateChat } = require('./repository');
 
 const TelegramBot = require('node-telegram-bot-api');
 
-const token = process.env.TELEGRAM_TOKEN;
+const token = '5594626655:AAHPrN4jgWeLNuoGsHomF__ggck1kSc4lfU';
 const bot = new TelegramBot(token, { polling: false });
 
 const SOMETHING_WRONG_MESSAGE = "Hmm... Something went wrong. We are already fixing this."
@@ -45,12 +45,17 @@ async function handleBindCommand(message) {
 
     let privateChatInfo = await getPrivateChatInfoByUserId(userId);
 
+    if (privateChatInfo.status === ERROR) {
+      await bot.sendMessage(chatId, SOMETHING_WRONG_MESSAGE);
+      return;
+    }
+
     if (!privateChatInfo) {
       await bot.sendMessage(chatId, "Can't create binding code because you didn't start a conversation with nodde bot in direct messages.");
       return;
     }
 
-    let newBinding = {
+    const newBinding = {
       type: "binding",
       code: `bind${generateRandomCode()}`,
       chat_id: chatId,
@@ -58,6 +63,8 @@ async function handleBindCommand(message) {
       user_id: userId,
       created_at: unixTimestamp()
     }
+
+    console.log(`Try to save new binding ${newBinding}`);
 
     let { status } = await saveNewBindingCode(newBinding);
 
@@ -112,7 +119,7 @@ async function handleInviteCode(message) {
   
   let text = message.text;
   let code = text; // TODO get subsctring and validate;
-  let chatId = message.chat.id;
+  let privateChatId = message.chat.id;
   let userId = message.from.id;
 
   let { status, item } = await getInviteByCode(code);
@@ -121,23 +128,23 @@ async function handleInviteCode(message) {
     let invite = result.item;
     let inviteLink = invite.invite_link;
     if (inviteLink) {
-      await bot.sendMessage(chatId, "This invite code already used.");
+      await bot.sendMessage(privateChatId, "This invite code already used.");
     } else {
 
       let groupChatId = item.chat_id;
       let newInviteLink = await bot.createChatInviteLink(groupChatId, { member_limit: 1, creates_join_request: true });
       
-      item.invite_link = newInviteLink;
-      item.updated_at = unixTimestamp();
-      item.user_id = userId;
-      item.invite_refresh_count = 0;
-      item.user_private_chat_id = chatId;
+      invite.invite_link = newInviteLink;
+      invite.updated_at = unixTimestamp();
+      invite.user_id = userId;
+      invite.invite_refresh_count = 0;
+      invite.user_private_chat_id = privateChatId;
 
       let { status } = await saveInvite(invite);
 
       if (status === SUCCESS) {
         console.log(`Invite link successfully generated for user ${userId} in chat ${chatId}`);
-        await bot.sendMessage(chatId, "");
+        await bot.sendMessage(chatId, `Your invite link here ${newInviteLink}. Don't share it with anyone`);
       } else {
         console.log(`Error when save infite link for user ${userId} in chat ${chatId}`);
         await bot.sendMessage(chatId, SOMETHING_WRONG_MESSAGE);

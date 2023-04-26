@@ -1,7 +1,7 @@
 'use strict'
 
-import { COMMON_ERROR_MESSAGE, SUCCESS } from "./common";
-import { getInviteInfoByContentIdAndAddress } from "./repository";
+const { COMMON_ERROR_MESSAGE, SUCCESS } = require("./common");
+const { getInviteInfoByContentIdAndAddress } = require("./repository");
 
 /*
     Get invite code handler

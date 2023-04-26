@@ -1,7 +1,7 @@
 'use strict';
 
-import { unixTimestamp, INVITE_TYPE, COMMON_ERROR_MESSAGE, SUCCESS, generateRandomCode } from './common';
-import { getTelegramChatByContentId, savePreparedInvite } from './repository';
+const { unixTimestamp, INVITE_TYPE, COMMON_ERROR_MESSAGE, SUCCESS, generateRandomCode } = require('./common');
+const { getTelegramChatByContentId, savePreparedInvite } = require('./repository');
 
 module.exports.prepareInvite = async (event, context) => {
 

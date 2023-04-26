@@ -1,6 +1,6 @@
 'use strict'
 
-import { ERROR, INVITE_TYPE, SUCCESS, telegramPrivateChatsTable, telegramTable } from './common';
+const { ERROR, INVITE_TYPE, SUCCESS, telegramPrivateChatsTable, telegramTable, COMMON_ERROR_MESSAGE } = require('./common');
 
 const AWS = require('aws-sdk');
 
@@ -36,7 +36,7 @@ const save = async (params) => {
 }
 
 
-export const getInviteInfoByContentIdAndAddress = async (contentId, address) => {
+module.exports.getInviteInfoByContentIdAndAddress = async (contentId, address) => {
 
     const params = {
         TableName: telegramTable,
@@ -50,7 +50,7 @@ export const getInviteInfoByContentIdAndAddress = async (contentId, address) => 
     return await get(params);
 }
 
-export const getTelegramChatByContentId = async (contentId) => {
+module.exports.getTelegramChatByContentId = async (contentId) => {
 
     const params = {
         TableName: telegramTable,
@@ -63,7 +63,7 @@ export const getTelegramChatByContentId = async (contentId) => {
     return await get(params);
 }
 
-export const savePreparedInvite = async (preparedInvite) => {
+module.exports.savePreparedInvite = async (preparedInvite) => {
 
     const params = {
         TableName: telegramTable,
@@ -73,7 +73,7 @@ export const savePreparedInvite = async (preparedInvite) => {
     return await save(params);
 }
 
-export async function getPrivateChatInfoByUserId(userId) {
+module.exports.getPrivateChatInfoByUserId = async (userId) => {
 
     let params = {
         TableName: telegramPrivateChatsTable,
@@ -85,7 +85,7 @@ export async function getPrivateChatInfoByUserId(userId) {
     return await get(params);
 }
 
-export async function saveNewBindingCode(bindingCode) {
+module.exports.saveNewBindingCode = async (bindingCode) => {
 
     let params = {
         TableName: telegramTable,
@@ -95,7 +95,7 @@ export async function saveNewBindingCode(bindingCode) {
     return await save(params);
 }
 
-export const getBindingByCode = async (code) => {
+module.exports.getBindingByCode = async (code) => {
 
     const params = {
         TableName: telegramTable,
@@ -108,7 +108,7 @@ export const getBindingByCode = async (code) => {
     return await get(params);
 }
 
-export const saveBinding = async(binding) => {
+module.exports.saveBinding = async(binding) => {
     
     const params = {
         TableName: telegramTable,
@@ -118,7 +118,7 @@ export const saveBinding = async(binding) => {
     return await save(binding);
 }
 
-export const getInviteByCode = async (code) => {
+module.exports.getInviteByCode = async (code) => {
     
     let params = {
         TableName: telegramTable,
@@ -131,7 +131,7 @@ export const getInviteByCode = async (code) => {
     return await get(params);
 }
 
-export const savePrivateChat = async (privateChat) => {
+module.exports.savePrivateChat = async (privateChat) => {
 
     let params = {
         TableName: telegramPrivateChatsTable,
@@ -141,7 +141,7 @@ export const savePrivateChat = async (privateChat) => {
     return await save(params);
 }
 
-export const saveInvite = async (invite) => {
+module.exports.saveInvite = async (invite) => {
 
     let params = {
         TableName: telegramTable,

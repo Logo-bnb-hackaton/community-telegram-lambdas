@@ -1,24 +1,26 @@
 'use strict';
 
+const { crypto, randomBytes } = require("crypto");
+
 // DynamoDB tables
-export const telegramTable = "Community-telegram";
-export const telegramPrivateChatsTable = "Community-telegram-private-chats";
+module.exports.telegramTable = "Community-telegram";
+module.exports.telegramPrivateChatsTable = "Community-telegram-private-chats";
 
-export const BINDING_TYPE = "binding";
-export const INVITE_TYPE = "invite";
+module.exports.BINDING_TYPE = "binding";
+module.exports.INVITE_TYPE = "invite";
 
-export const COMMON_ERROR_MESSAGE = "Something went wrong";
+module.exports.COMMON_ERROR_MESSAGE = "Something went wrong";
 
 // Statuses
-export const SUCCESS = "success";
-export const ERROR = "error";
+module.exports.SUCCESS = "success";
+module.exports.ERROR = "error";
 
-export function unixTimestamp(date = Date.now()) {
+module.exports.unixTimestamp = (date = Date.now()) => {
     return Math.floor(date / 1000)
 }
 
-export function generateRandomCode() {
-    const buffer = crypto.randomBytes(32);
+module.exports.generateRandomCode = () => {
+    const buffer = randomBytes(32);
     const randomString = buffer.toString('hex');
     return randomString;
 }
