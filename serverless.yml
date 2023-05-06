@@ -30,26 +30,16 @@ provider:
 
 functions:
   bot:
-    handler: src/telegram-webhool-handler.telegramWebhookHandler
+    handler: src/handler/telegram-webhool-handler.telegramWebhookHandler
     events:
       - http:
           path: nodde-tg-bot
           method: post     
   bindChat:
-    handler: src/bind-chat-handler.bindChatHandler
-    events:
-      - http:
-          path: bind-chat
-          method: post        
-  inviteCodePrepare:
-    handler: src/invite-code
-    events:
-      - http:
-          path: prepare-invite
-          method: post
-  inviteCodeGet:
-    handler: invite-code-get.getInviteCode
-    events:
-      - http:
-          path: get-invite-code    
-          method: get
+    handler: src/handler/bind-chat-handler.bindChatHandler  
+  getChatBindingStatus:
+    handler: src/handler/get-chat-binding-status.getChatBindiginStatusHandler
+  generateInviteCode:
+    handler: src/handler/generate-invite-code-handler.generateInviteCodeHandler
+  getInviteLinkStatus:
+    handler: src/handler/get-invite-link-status-handler.getInviteLinkStatusHandler
