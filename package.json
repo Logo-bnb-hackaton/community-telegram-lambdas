@@ -2,18 +2,35 @@
   "name": "telegram-lambdas",
   "version": "1.0.0",
   "description": "",
-  "main": "bot.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "install": "typings install",
+    "build": "rimraf ./dist && tsc",
+    "deploy": "npm run build && serverless deploy",
+    "typings": "typings install",
+    "lint": "tslint \"src/**/*.ts\" --force",
+    "test:function": "serverless invoke --function serverlessAWSLambdaTS",
+    "test:runlocal": "npm run build && run-local-lambda --file dist/handler.js --handler handleIt --event eventExample.json --timeout 5000",
+    "test:local": "npm run build && lambda-local --function dist/handler.js --event eventExample.json --timeout 5"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.1363.0",
+    "@aws-sdk/client-dynamodb": "^3.328.0",
+    "@aws-sdk/lib-dynamodb": "^3.328.0",
+    "@aws-sdk/util-dynamodb": "^3.328.0",
+    "@types/aws-lambda": "^8.10.115",
+    "dotenv": "^16.0.3",
     "ethers": "5.4",
     "node-telegram-bot-api": "^0.61.0",
-    "request": "^2.88.2",
-    "request-promise": "^4.2.6",
     "serverless": "^3.30.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.1.0",
+    "@types/node-telegram-bot-api": "^0.61.6",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "tslib": "^2.5.0",
+    "typescript": "^5.0.4"
   }
 }

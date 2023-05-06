@@ -3,7 +3,7 @@ frameworkVersion: '3'
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs16.x
   region: us-east-1
   iamRoleStatements:
     - Effect: Allow
@@ -15,7 +15,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/Community-telegram"
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/telegram-codes"
     - Effect: Allow
       Action:
         - dynamodb:DescribeTable
@@ -25,24 +25,24 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/Community-telegram-private-chats"
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/telegram-private-chats"
 
 
 functions:
   bot:
-    handler: handler.bot
+    handler: src/telegram-webhool-handler.telegramWebhookHandler
     events:
       - http:
           path: nodde-tg-bot
           method: post     
   bindChat:
-    handler: bind-chat.bindChat
+    handler: src/bind-chat-handler.bindChatHandler
     events:
       - http:
           path: bind-chat
           method: post        
   inviteCodePrepare:
-    handler: invite-code-prepare.prepareInvite
+    handler: src/invite-code
     events:
       - http:
           path: prepare-invite
