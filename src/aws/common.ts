@@ -1,3 +1,4 @@
+import { APIGatewayProxyResultV2 } from "aws-lambda";
 import { randomBytes } from "crypto";
 import dotenv from 'dotenv';
 
@@ -14,4 +15,21 @@ export const generateCode = (): string => {
     const buffer = randomBytes(32);
     const randomString = buffer.toString('hex');
     return randomString;
+}
+
+export const process = async (block: () => APIGatewayProxyResultV2): Promise<APIGatewayProxyResultV2> => {
+    try {
+        await block();
+    } catch (err) {
+        console.error(err);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                error: {
+                    code: 'unknown_error',
+                    message: 'Something went wrong'
+                }
+            })
+        }
+    }
 }

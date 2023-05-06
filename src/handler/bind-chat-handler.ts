@@ -1,7 +1,7 @@
 import { APIGatewayEvent, APIGatewayProxyResult, Handler } from "aws-lambda";
 import { telegramCodeRepository, TelegramCode } from "../repository/telegram-code-repository";
 import { unixTimestamp } from "../aws/common";
-import { okResponse, unknownErrorResponse } from "../aws/lambda";
+import { errorResponse, okResponse, unknownErrorResponse } from "../aws/lambda";
 
 interface BindChatRequest {
     address: string,
@@ -13,6 +13,13 @@ export const bindChatHandler: Handler = async (event: APIGatewayEvent): Promise<
     try {
         
         const request = JSON.parse(event.body) as BindChatRequest;
+
+        const bindedTelegramCode = await telegramCodeRepository.findBindingBySubscriptionId(request.subscription_id);
+        if (bindedTelegramCode) {
+            console.log(`The subscription ${request.subscription_id} already binded with chatId ${bindedTelegramCode.chat_id}`);
+            return errorResponse(400, 'subscription_already_binded', 'The subscription already binded with telegram group');
+        }
+
         const telegramCode: TelegramCode = await telegramCodeRepository.getByCode(request.code);
         
         if (!telegramCode) {
