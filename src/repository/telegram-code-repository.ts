@@ -1,6 +1,6 @@
 import { documentClient } from "../aws/dynamo"
-import { QueryCommand } from "@aws-sdk/client-dynamodb"
-import { GetCommand, GetCommandInput, PutCommand, PutCommandInput, QueryCommandInput } from "@aws-sdk/lib-dynamodb"
+import { GetItemCommand, GetItemCommandInput, PutItemCommand, PutItemCommandInput, QueryCommand } from "@aws-sdk/client-dynamodb"
+import { QueryCommandInput } from "@aws-sdk/lib-dynamodb"
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb"
 
 
@@ -24,18 +24,27 @@ export enum TelegramCodeType {
 }
 
 export interface TelegramCodeRepository {
-    findBindingBySubscriptionId(subscriptionId: string): Promise<TelegramCode|undefined>
-    getByAddressAndSubscriptionId(address: string, subscriptionId: string): Promise<TelegramCode|undefined>
-    getByCode(code: string): Promise<TelegramCode|undefined>
+
+    findBindingBySubscriptionId(subscriptionId: string): Promise<TelegramCode | undefined>
+
+    getByAddressAndSubscriptionId(address: string, subscriptionId: string): Promise<TelegramCode | undefined>
+
+    getByCode(code: string): Promise<TelegramCode | undefined>
+
     save(telegramCode: TelegramCode): Promise<void>
+
     update(telegramCode: TelegramCode): Promise<void>
+
 }
 
 class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
 
     private table: string = 'telegram-codes';
 
-    async findBindingBySubscriptionId(subscriptionId: string): Promise<TelegramCode|undefined> {
+    async findBindingBySubscriptionId(subscriptionId: string): Promise<TelegramCode | undefined> {
+
+        console.log(`Start find subscription binding for id ${subscriptionId}`);
+
         const input: QueryCommandInput = {
             TableName: this.table,
             Limit: 2,
@@ -59,12 +68,14 @@ class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
             throw new Error('Found two binded chats illegal state');
         }
 
+        console.log(`Found binding for subscription ${subscriptionId}`);
+
         return unmarshall(Items[0]) as TelegramCode;
     }
     
     async getByAddressAndSubscriptionId(address: string, subscriptionId: string): Promise<TelegramCode> {
         
-        const input: GetCommandInput = {
+        const input: GetItemCommandInput = {
             TableName: this.table,
             Key: marshall({
                 address: address,
@@ -72,25 +83,39 @@ class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
             })
         };
 
-        const command: GetCommand = new GetCommand(input);
+        const command: GetItemCommand = new GetItemCommand(input);
 
         const { Item } = await documentClient.send(command);
+        if (!Item) {
+            console.log(`Can't find binding for address ${address} and subscriptionId ${subscriptionId}`);
+            return;
+        }
+
+        console.log(`Found telegramCode for address ${address} and subscriptionId ${subscriptionId}`);
 
         return unmarshall(Item) as TelegramCode
     }
 
     async getByCode(code: string): Promise<TelegramCode> {
+
+        console.log(`Get telegram code by code ${code}`);
         
-        const input: GetCommandInput = {
+        const input: GetItemCommandInput = {
             TableName: this.table,
             Key: marshall({
                 code: code
             })
         };
 
-        const command: GetCommand = new GetCommand(input);
+        const command: GetItemCommand = new GetItemCommand(input);
 
         const { Item } = await documentClient.send(command);
+        if (!Item) {
+            console.log(`Can't find telegramCode for ${code}`);
+            return
+        }
+
+        console.log(`Found telegramCode entity for ${code}`);
 
         return unmarshall(Item) as TelegramCode
     }
@@ -99,12 +124,12 @@ class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
 
         console.log(`Try to save new telegram code ${telegramCode.code}`)
 
-        const input: PutCommandInput = {
+        const input: PutItemCommandInput = {
             TableName: this.table,
             Item: marshall(telegramCode)
         }
 
-        const command: PutCommand = new PutCommand(input);
+        const command: PutItemCommand = new PutItemCommand(input);
 
         await documentClient.send(command);
 
@@ -115,12 +140,12 @@ class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
 
         console.log(`Start update item ${telegramCode}`);
         
-        const input: PutCommandInput = {
+        const input: PutItemCommandInput = {
             TableName: this.table,
             Item: marshall(telegramCode)
         }
 
-        const command: PutCommand = new PutCommand(input);
+        const command: PutItemCommand = new PutItemCommand(input);
 
         await documentClient.send(command);
 
