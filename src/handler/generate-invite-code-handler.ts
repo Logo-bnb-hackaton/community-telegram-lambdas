@@ -1,5 +1,4 @@
 import { errorResponse, toResponse, unknownErrorResponse } from "../aws/lambda";
-import { subscriptionContractService } from "../service/SubscriptionContractService";
 import { APIGatewayEvent, APIGatewayProxyResult, Handler } from "aws-lambda";
 import { GetInviteLinkStatusType } from "./get-invite-link-status-handler";
 import { TelegramCode, TelegramCodeType, telegramCodeRepository } from "../repository/telegram-code-repository";
@@ -19,11 +18,6 @@ export const generateInviteCodeHandler: Handler = async (event: APIGatewayEvent)
     try {
         const request = JSON.parse(event.body) as GenerateInviteCodeRequest;
         const { address, subscription_id } = request;
-        const subscriptionEvent = await subscriptionContractService.findNewSubscription(address, subscription_id);
-        if (!subscriptionEvent) {
-            console.log(`Not found payment event for address ${address}, subscription_id ${subscription_id}`);
-            return errorResponse(404, 'not_found', "Not found payed subscription");
-        }
 
         const bindedCode = await telegramCodeRepository.findBindingBySubscriptionId(subscription_id);
 
