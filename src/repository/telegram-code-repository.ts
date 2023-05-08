@@ -88,7 +88,7 @@ class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
         const { Item } = await documentClient.send(command);
         if (!Item) {
             console.log(`Can't find binding for address ${address} and subscriptionId ${subscriptionId}`);
-            return;
+            return undefined;
         }
 
         console.log(`Found telegramCode for address ${address} and subscriptionId ${subscriptionId}`);
@@ -112,7 +112,7 @@ class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
         const { Item } = await documentClient.send(command);
         if (!Item) {
             console.log(`Can't find telegramCode for ${code}`);
-            return
+            return undefined;
         }
 
         console.log(`Found telegramCode entity for ${code}`);

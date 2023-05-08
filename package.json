@@ -3,15 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
+  "main": "handler.js",
   "scripts": {
-    "install": "typings install",
-    "build": "rimraf ./dist && tsc",
+    "build": "serverless package",
     "deploy": "npm run build && serverless deploy",
-    "typings": "typings install",
-    "lint": "tslint \"src/**/*.ts\" --force",
-    "test:function": "serverless invoke --function serverlessAWSLambdaTS",
-    "test:runlocal": "npm run build && run-local-lambda --file dist/handler.js --handler handleIt --event eventExample.json --timeout 5000",
-    "test:local": "npm run build && lambda-local --function dist/handler.js --event eventExample.json --timeout 5"
+    "lint": "tslint \"src/**/*.ts\" --force"
+  },
+  "imports": {
+    "@/*": {
+      "default": "./src/*"
+    }
   },
   "author": "",
   "license": "ISC",
@@ -28,6 +29,7 @@
   "devDependencies": {
     "@types/node": "^20.1.0",
     "@types/node-telegram-bot-api": "^0.61.6",
+    "serverless-plugin-typescript": "^2.1.4",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
     "tslib": "^2.5.0",

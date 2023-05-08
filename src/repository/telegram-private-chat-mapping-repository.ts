@@ -17,7 +17,7 @@ export interface TelegramPrivateChatMappingRepository {
 
 export class TelegramPrivateChatMappingRepositoryImpl implements TelegramPrivateChatMappingRepository {
 
-    private table: string = "telegram-private-chat-mapping"
+    private table: string = "telegram-private-chats"
 
     async save(mapping: PrivatChatMapping): Promise<void> {
 

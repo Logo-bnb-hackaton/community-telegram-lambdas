@@ -27,19 +27,21 @@ provider:
         - dynamodb:DeleteItem
       Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/telegram-private-chats"
 
+plugins:
+  - serverless-plugin-typescript
 
 functions:
   bot:
-    handler: src/handler/telegram-webhool-handler.telegramWebhookHandler
+    handler: handler.telegramWebhookHandler
     events:
       - http:
           path: nodde-tg-bot
           method: post     
   bindChat:
-    handler: src/handler/bind-chat-handler.bindChatHandler  
+    handler: handler.bindChatHandler
   getChatBindingStatus:
-    handler: src/handler/get-chat-binding-status.getChatBindiginStatusHandler
+    handler: handler.getChatBindiginStatusHandler
   generateInviteCode:
-    handler: src/handler/generate-invite-code-handler.generateInviteCodeHandler
+    handler: handler.generateInviteCodeHandler
   getInviteLinkStatus:
-    handler: src/handler/get-invite-link-status-handler.getInviteLinkStatusHandler
+    handler: handler.getInviteLinkStatusHandler
