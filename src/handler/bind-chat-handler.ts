@@ -9,17 +9,17 @@ interface BindChatRequest {
     subscription_id: string
 }
 
-export const bindChatHandler: Handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
+export const bindChatHandler: Handler = async (request: BindChatRequest): Promise<APIGatewayProxyResult> => {
     try {
         console.log('Start processing bind chat request:');
-        console.log(event.body);
-        const request = JSON.parse(event.body!!) as BindChatRequest;
+        console.log(request);
 
-        const bindedTelegramCode = await telegramCodeRepository.findBindingBySubscriptionId(request.subscription_id);
-        if (bindedTelegramCode) {
-            console.log(`The subscription ${request.subscription_id} already binded with chatId ${bindedTelegramCode.chat_id}`);
-            return errorResponse(400, 'subscription_already_binded', 'The subscription already binded with telegram group');
-        }
+        // console.log('findBindingBySubscriptionId');
+        // const bindedTelegramCode = await telegramCodeRepository.findBindingBySubscriptionId(request.subscription_id);
+        // if (bindedTelegramCode) {
+        //     console.log(`The subscription ${request.subscription_id} already binded with chatId ${bindedTelegramCode.chat_id}`);
+        //     return errorResponse(400, 'subscription_already_binded', 'The subscription already binded with telegram group');
+        // }
 
         const telegramCode: TelegramCode | undefined = await telegramCodeRepository.getByCode(request.code);
 
@@ -51,7 +51,7 @@ export const bindChatHandler: Handler = async (event: APIGatewayEvent): Promise<
             code: telegramCode.code,
             chat_id: telegramCode.chat_id,
             created_at: telegramCode.created_at,
-            type: telegramCode.type,
+            code_type: telegramCode.code_type,
             user_id: telegramCode.user_id,
             address: request.address,
             subscription_id: request.subscription_id,

@@ -27,7 +27,7 @@ export const generateInviteCodeHandler: Handler = async (event: APIGatewayEvent)
         }
 
         const newInviteCode: TelegramCode = {
-            type: TelegramCodeType.INVITE, 
+            code_type: TelegramCodeType.INVITE,
             code: `inv${generateCode()}`,
             address: address,
             subscription_id: subscription_id,

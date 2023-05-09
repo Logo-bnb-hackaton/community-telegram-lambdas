@@ -2,20 +2,21 @@ import {generateCode, SOMETHING_WRONG_MESSAGE, unixTimestamp} from "../aws/commo
 import {okResponse} from "../aws/lambda";
 import {TelegramCode, telegramCodeRepository, TelegramCodeType} from "../repository/telegram-code-repository";
 import {
-    PrivatChatMapping,
+    PrivateChatMapping,
     telegramPrivateChatMappingRepository
 } from "../repository/telegram-private-chat-mapping-repository";
 import {APIGatewayEvent, APIGatewayProxyResult, Handler} from "aws-lambda";
 import TelegramBot, {Update} from "node-telegram-bot-api";
 
-const token = process.env.TOKEN!!;
-const username = process.env.USERNAME;
-const bot = new TelegramBot(token, { polling: false });
+const token = '5594626655:AAHPrN4jgWeLNuoGsHomF__ggck1kSc4lfU';
+const username = 'sprut_signals_bot';
+const bot = new TelegramBot(token, {polling: false});
 
 export const telegramWebhookHandler: Handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
 
     try {
-        
+        console.log('telegramWebhookHandler');
+        console.log(event.body);
         const update = JSON.parse(event.body!!) as Update;
         const message = (update.message || update.edited_message)!;
         const chat = message.chat;
@@ -23,10 +24,11 @@ export const telegramWebhookHandler: Handler = async (event: APIGatewayEvent): P
 
         switch (chatType) {
             case 'group':
-                handleGroupMessage(message);
+            case 'supergroup':
+                await handleGroupMessage(message);
                 break;
             case 'private':
-                handlePrivateMessage(message);
+                await handlePrivateMessage(message);
                 break;
             default:
                 break;
@@ -41,6 +43,8 @@ export const telegramWebhookHandler: Handler = async (event: APIGatewayEvent): P
 
 const handleGroupMessage = async (message: TelegramBot.Message): Promise<void> => {
     const text = message.text;
+    console.log(`handleGroupMessage`);
+    console.log(message);
     if (`@${username} bind` === text) {
         await handleBindCommand(message);
     }
@@ -53,6 +57,7 @@ const handleBindCommand = async (message: TelegramBot.Message): Promise<void> =>
     const isAdmin = admins.some((admin) => admin.user.id === userId);
 
     if (isAdmin) {
+        console.log('handleBindCommand isAdmin');
 
         try {
 
@@ -63,7 +68,7 @@ const handleBindCommand = async (message: TelegramBot.Message): Promise<void> =>
             }
 
             const newBinding: TelegramCode = {
-                type: TelegramCodeType.BINDING,
+                code_type: TelegramCodeType.BINDING,
                 code: `bind${generateCode()}`,
                 chat_id: String(chatId),
                 user_private_chat_id: privateChatInfo.chat_id,
@@ -111,7 +116,7 @@ const handleStartCommand = async (message: TelegramBot.Message): Promise<void> =
     const userId = message.from!!.id;
     console.log(`\\start command was invoked by user ${userId} in chat ${chatId}`);
 
-    const privateChatInfo: PrivatChatMapping = {
+    const privateChatInfo: PrivateChatMapping = {
         chat_id: String(chatId),
         user_id: String(userId)
     };
@@ -140,7 +145,7 @@ const handleInviteCode = async (message: TelegramBot.Message): Promise<void> => 
 
         if (!telegramCode) {
             console.log(`Code ${code} not found`);
-            bot.sendMessage(privateChatId, 'Can\'t find such invite code');
+            await bot.sendMessage(privateChatId, 'Can\'t find such invite code');
             return;
         }
 

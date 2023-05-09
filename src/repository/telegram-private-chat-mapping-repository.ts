@@ -2,24 +2,24 @@ import {GetItemCommand, GetItemCommandInput, PutItemCommand, PutItemCommandInput
 import {documentClient} from "../aws/dynamo"
 import {marshall, unmarshall} from "@aws-sdk/util-dynamodb"
 
-export interface PrivatChatMapping {
+export interface PrivateChatMapping {
     user_id: string,
     chat_id: string,
 }
 
 export interface TelegramPrivateChatMappingRepository {
 
-    save(mapping: PrivatChatMapping): Promise<void>
+    save(mapping: PrivateChatMapping): Promise<void>
 
-    getByUserId(userId: number): Promise<PrivatChatMapping>
+    getByUserId(userId: number): Promise<PrivateChatMapping>
 
 }
 
 export class TelegramPrivateChatMappingRepositoryImpl implements TelegramPrivateChatMappingRepository {
 
-    private table: string = "telegram-private-chats"
+        private table: string = "telegram-private-chats"
 
-    async save(mapping: PrivatChatMapping): Promise<void> {
+    async save(mapping: PrivateChatMapping): Promise<void> {
 
         console.log(`Try to save new mapping ${mapping}`);
 
@@ -35,12 +35,12 @@ export class TelegramPrivateChatMappingRepositoryImpl implements TelegramPrivate
         console.log(`New mapping saved ${mapping}`);
     }
 
-    async getByUserId(userId: number): Promise<PrivatChatMapping> {
-
+    async getByUserId(userId: number): Promise<PrivateChatMapping> {
+        console.log(`Loading user by id: ${userId}`);
         const input: GetItemCommandInput = {
             TableName: this.table,
             Key: marshall({
-                user_id: userId
+                user_id: userId.toString()
             })
         }
 
@@ -48,7 +48,7 @@ export class TelegramPrivateChatMappingRepositoryImpl implements TelegramPrivate
 
         const {Item} = await documentClient.send(command);
 
-        return unmarshall(Item!!) as PrivatChatMapping
+        return unmarshall(Item!!) as PrivateChatMapping
     }
 }
 
