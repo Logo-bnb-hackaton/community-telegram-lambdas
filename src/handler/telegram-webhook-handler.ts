@@ -127,7 +127,7 @@ const handleStartCommand = async (message: TelegramBot.Message): Promise<void> =
 
         await telegramPrivateChatMappingRepository.save(privateChatInfo);
         console.log(`New relation saved successfully, user ${userId} in chat ${chatId}. Send greeting to user`);
-        await bot.sendMessage(chatId, "Hello! If you have binding or invintation code, please send it in the next message.");
+        await bot.sendMessage(chatId, "Hello! If you have invintation code, please send it in the next message. If you an author follow instructions on `Nodde` site.");
 
     } catch (err) {
         console.log(err);
@@ -154,7 +154,13 @@ const handleInviteCode = async (message: TelegramBot.Message): Promise<void> => 
         const inviteLink = telegramCode.invite_link;
 
         if (inviteLink) {
-            await bot.sendMessage(privateChatId, "This invite code already used.");
+            if (telegramCode.user_id === userId) {
+                console.log(`Found invite link for code ${code}. Code presented by owner ${userId} send invite link again`);
+                await bot.sendMessage(privateChatId, `Your invite link here ${inviteLink}. Don't share it with anyone`);
+            } else {
+                console.log(`Found invite link for code ${code}. Code presented not by owner ${userId}, the code probably compromised`);
+                await bot.sendMessage(privateChatId, "This invite code already used.");
+            }
             return;
         }
 
