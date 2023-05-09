@@ -16,7 +16,7 @@ interface GenerateInviteCodeResponse {
 
 export const generateInviteCodeHandler: Handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
     try {
-        const request = JSON.parse(event.body) as GenerateInviteCodeRequest;
+        const request = JSON.parse(event.body!!) as GenerateInviteCodeRequest;
         const { address, subscription_id } = request;
 
         const bindedCode = await telegramCodeRepository.findBindingBySubscriptionId(subscription_id);

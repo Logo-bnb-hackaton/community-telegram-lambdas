@@ -22,7 +22,7 @@ export const getInviteLinkStatusHandler: Handler = async (event: APIGatewayEvent
     
     try {
 
-        const request = JSON.parse(event.body) as GetInviteLinkStatusRequest;
+        const request = JSON.parse(event.body!!) as GetInviteLinkStatusRequest;
         const code = await telegramCodeRepository.getByAddressAndSubscriptionId(request.address, request.subscription_id);
         
         if (!code) {

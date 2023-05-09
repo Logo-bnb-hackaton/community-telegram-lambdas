@@ -16,7 +16,7 @@ export enum ChatBindingStatus {
     NOT_BINDED
 }
 
-export const getChatBindiginStatusHandler: Handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+export const getChatBindingStatusHandler: Handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     try {
         const request = JSON.parse(event.body!) as GetChatBindingStatusRequest;
         const telegramCode = await telegramCodeRepository.findBindingBySubscriptionId(request.subscription_id);

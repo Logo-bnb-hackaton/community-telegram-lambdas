@@ -14,7 +14,6 @@ const unmarshallOptions = {
 
 const translateConfig = { marshallOptions, unmarshallOptions };
 
-const dynamo = new DynamoDBClient({ region: AWS_REGION });
-const documentClient = DynamoDBDocumentClient.from(dynamo, translateConfig);
+export const dynamo = new DynamoDBClient({ region: AWS_REGION });
+export const documentClient = DynamoDBDocumentClient.from(dynamo, translateConfig);
 
-export { dynamo, documentClient };

@@ -1,8 +1,13 @@
-import { documentClient } from "../aws/dynamo"
-import { GetItemCommand, GetItemCommandInput, PutItemCommand, PutItemCommandInput, QueryCommand } from "@aws-sdk/client-dynamodb"
-import { QueryCommandInput } from "@aws-sdk/lib-dynamodb"
-import { marshall, unmarshall } from "@aws-sdk/util-dynamodb"
-
+import {documentClient} from "../aws/dynamo"
+import {
+    GetItemCommand,
+    GetItemCommandInput,
+    PutItemCommand,
+    PutItemCommandInput,
+    QueryCommand
+} from "@aws-sdk/client-dynamodb"
+import {QueryCommandInput} from "@aws-sdk/lib-dynamodb"
+import {marshall, unmarshall} from "@aws-sdk/util-dynamodb"
 
 export interface TelegramCode {
     code: string,
@@ -37,7 +42,7 @@ export interface TelegramCodeRepository {
 
 }
 
-class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
+export class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
 
     private table: string = 'telegram-codes';
 
@@ -57,7 +62,7 @@ class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
 
         const command: QueryCommand = new QueryCommand(input);
 
-        const { Items } = await documentClient.send(command);
+        const {Items} = await documentClient.send(command);
 
         if (!Items || Items.length === 0) {
             console.log(`Can't find binding`)
@@ -72,9 +77,9 @@ class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
 
         return unmarshall(Items[0]) as TelegramCode;
     }
-    
-    async getByAddressAndSubscriptionId(address: string, subscriptionId: string): Promise<TelegramCode> {
-        
+
+    async getByAddressAndSubscriptionId(address: string, subscriptionId: string): Promise<TelegramCode | undefined> {
+
         const input: GetItemCommandInput = {
             TableName: this.table,
             Key: marshall({
@@ -85,7 +90,7 @@ class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
 
         const command: GetItemCommand = new GetItemCommand(input);
 
-        const { Item } = await documentClient.send(command);
+        const {Item} = await documentClient.send(command);
         if (!Item) {
             console.log(`Can't find binding for address ${address} and subscriptionId ${subscriptionId}`);
             return undefined;
@@ -96,10 +101,10 @@ class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
         return unmarshall(Item) as TelegramCode
     }
 
-    async getByCode(code: string): Promise<TelegramCode> {
+    async getByCode(code: string): Promise<TelegramCode | undefined> {
 
         console.log(`Get telegram code by code ${code}`);
-        
+
         const input: GetItemCommandInput = {
             TableName: this.table,
             Key: marshall({
@@ -109,7 +114,7 @@ class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
 
         const command: GetItemCommand = new GetItemCommand(input);
 
-        const { Item } = await documentClient.send(command);
+        const {Item} = await documentClient.send(command);
         if (!Item) {
             console.log(`Can't find telegramCode for ${code}`);
             return undefined;
@@ -139,7 +144,7 @@ class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
     async update(telegramCode: TelegramCode): Promise<void> {
 
         console.log(`Start update item ${telegramCode}`);
-        
+
         const input: PutItemCommandInput = {
             TableName: this.table,
             Item: marshall(telegramCode)
@@ -151,8 +156,7 @@ class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
 
         console.log(`Finish update item ${telegramCode}`)
     }
-    
+
 }
 
-const telegramCodeRepository: TelegramCodeRepository = new TelegramCodeRepositoryImpl();
-export { telegramCodeRepository }
+export const telegramCodeRepository: TelegramCodeRepository = new TelegramCodeRepositoryImpl();

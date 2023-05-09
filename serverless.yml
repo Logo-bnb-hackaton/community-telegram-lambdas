@@ -32,16 +32,16 @@ plugins:
 
 functions:
   bot:
-    handler: handler.telegramWebhookHandler
+    handler: src/handler/telegram-webhook-handler.telegramWebhookHandler
     events:
       - http:
           path: nodde-tg-bot
           method: post     
   bindChat:
-    handler: handler.bindChatHandler
+    handler: src/handler/bind-chat-handler.bindChatHandler
   getChatBindingStatus:
-    handler: handler.getChatBindiginStatusHandler
+    handler: src/handler/get-chat-binding-status-handler.getChatBindingStatusHandler
   generateInviteCode:
-    handler: handler.generateInviteCodeHandler
+    handler: src/handler/generate-invite-code-handler.generateInviteCodeHandler
   getInviteLinkStatus:
-    handler: handler.getInviteLinkStatusHandler
+    handler: src/handler/get-chat-binding-status-handler.getChatBindingStatusHandler

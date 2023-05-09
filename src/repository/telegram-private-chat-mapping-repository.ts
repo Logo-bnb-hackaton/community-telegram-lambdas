@@ -1,6 +1,6 @@
-import { GetItemCommand, GetItemCommandInput, PutItemCommand, PutItemCommandInput } from "@aws-sdk/client-dynamodb"
-import { documentClient } from "../aws/dynamo"
-import { marshall, unmarshall } from "@aws-sdk/util-dynamodb"
+import {GetItemCommand, GetItemCommandInput, PutItemCommand, PutItemCommandInput} from "@aws-sdk/client-dynamodb"
+import {documentClient} from "../aws/dynamo"
+import {marshall, unmarshall} from "@aws-sdk/util-dynamodb"
 
 export interface PrivatChatMapping {
     user_id: string,
@@ -12,7 +12,7 @@ export interface TelegramPrivateChatMappingRepository {
     save(mapping: PrivatChatMapping): Promise<void>
 
     getByUserId(userId: number): Promise<PrivatChatMapping>
-    
+
 }
 
 export class TelegramPrivateChatMappingRepositoryImpl implements TelegramPrivateChatMappingRepository {
@@ -36,7 +36,7 @@ export class TelegramPrivateChatMappingRepositoryImpl implements TelegramPrivate
     }
 
     async getByUserId(userId: number): Promise<PrivatChatMapping> {
-        
+
         const input: GetItemCommandInput = {
             TableName: this.table,
             Key: marshall({
@@ -46,12 +46,11 @@ export class TelegramPrivateChatMappingRepositoryImpl implements TelegramPrivate
 
         const command: GetItemCommand = new GetItemCommand(input);
 
-        const { Item } = await documentClient.send(command);
+        const {Item} = await documentClient.send(command);
 
-        return unmarshall(Item) as PrivatChatMapping
+        return unmarshall(Item!!) as PrivatChatMapping
     }
 }
 
 
-const telegramPrivateChatMappingRepository: TelegramPrivateChatMappingRepository = new TelegramPrivateChatMappingRepositoryImpl()
-export { telegramPrivateChatMappingRepository }
+export const telegramPrivateChatMappingRepository: TelegramPrivateChatMappingRepository = new TelegramPrivateChatMappingRepositoryImpl()

@@ -1,5 +1,5 @@
-import { APIGatewayProxyResultV2 } from "aws-lambda";
-import { randomBytes } from "crypto";
+import {APIGatewayProxyResultV2} from "aws-lambda";
+import {randomBytes} from "crypto";
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -13,13 +13,12 @@ export const unixTimestamp = (date: number = Date.now()): number => {
 
 export const generateCode = (): string => {
     const buffer = randomBytes(32);
-    const randomString = buffer.toString('hex');
-    return randomString;
+    return buffer.toString('hex');
 }
 
 export const process = async (block: () => APIGatewayProxyResultV2): Promise<APIGatewayProxyResultV2> => {
     try {
-        await block();
+        return await block();
     } catch (err) {
         console.error(err);
         return {

@@ -2,18 +2,8 @@
   "name": "telegram-lambdas",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
-  "main": "handler.js",
-  "scripts": {
-    "build": "serverless package",
-    "deploy": "npm run build && serverless deploy",
-    "lint": "tslint \"src/**/*.ts\" --force"
-  },
-  "imports": {
-    "@/*": {
-      "default": "./src/*"
-    }
-  },
+  "type": "commonjs",
+  "main": "index.js",
   "author": "",
   "license": "ISC",
   "dependencies": {
