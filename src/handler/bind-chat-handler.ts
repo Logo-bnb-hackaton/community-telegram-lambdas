@@ -1,7 +1,7 @@
-import {APIGatewayEvent, APIGatewayProxyResult, Handler} from "aws-lambda";
+import {APIGatewayProxyResult, Handler} from "aws-lambda";
 import {telegramCodeRepository, TelegramCode} from "../repository/telegram-code-repository";
 import {unixTimestamp} from "../aws/common";
-import {errorResponse, okResponse, unknownErrorResponse} from "../aws/lambda";
+import {okResponse, unknownErrorResponse} from "../aws/lambda";
 
 interface BindChatRequest {
     address: string,

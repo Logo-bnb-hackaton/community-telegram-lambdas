@@ -1,8 +1,8 @@
-import { errorResponse, toResponse, unknownErrorResponse } from "../aws/lambda";
-import { APIGatewayEvent, APIGatewayProxyResult, Handler } from "aws-lambda";
-import { GetInviteLinkStatusType } from "./get-invite-link-status-handler";
-import { TelegramCode, TelegramCodeType, telegramCodeRepository } from "../repository/telegram-code-repository";
-import { generateCode, unixTimestamp } from "../aws/common";
+import {errorResponse, toResponse, unknownErrorResponse} from "../aws/lambda";
+import {APIGatewayProxyResult, Handler} from "aws-lambda";
+import {GetInviteLinkStatusType} from "./get-invite-link-status-handler";
+import {TelegramCode, TelegramCodeType, telegramCodeRepository} from "../repository/telegram-code-repository";
+import {generateCode, unixTimestamp} from "../aws/common";
 
 interface GenerateInviteCodeRequest {
     address: string,
@@ -14,10 +14,10 @@ interface GenerateInviteCodeResponse {
     code: string
 }
 
-export const generateInviteCodeHandler: Handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
+export const generateInviteCodeHandler: Handler = async (request: GenerateInviteCodeRequest): Promise<APIGatewayProxyResult> => {
     try {
-        const request = JSON.parse(event.body!!) as GenerateInviteCodeRequest;
-        const { address, subscription_id } = request;
+
+        const {address, subscription_id} = request;
 
         const bindedCode = await telegramCodeRepository.findBindingBySubscriptionId(subscription_id);
 

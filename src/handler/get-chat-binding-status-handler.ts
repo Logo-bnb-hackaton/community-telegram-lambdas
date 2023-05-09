@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Handler } from "aws-lambda";
+import { APIGatewayProxyResult, Handler } from "aws-lambda";
 import { telegramCodeRepository } from "../repository/telegram-code-repository";
 import { toResponse } from "../aws/lambda";
 
@@ -16,9 +16,9 @@ export enum ChatBindingStatus {
     NOT_BINDED
 }
 
-export const getChatBindingStatusHandler: Handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+export const getChatBindingStatusHandler: Handler = async (request: GetChatBindingStatusRequest): Promise<APIGatewayProxyResult> => {
     try {
-        const request = JSON.parse(event.body!) as GetChatBindingStatusRequest;
+
         const telegramCode = await telegramCodeRepository.findBindingBySubscriptionId(request.subscription_id);
         if (!telegramCode) {
             console.log(`The subscription ${request.subscription_id} doesn't have binding with telegram chat`);

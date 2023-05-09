@@ -31,6 +31,7 @@ export const telegramWebhookHandler: Handler = async (event: APIGatewayEvent): P
                 await handlePrivateMessage(message);
                 break;
             default:
+                console.log(`Can't handle a message with chatType: ${chatType}`);
                 break;
         }
 
@@ -57,7 +58,6 @@ const handleBindCommand = async (message: TelegramBot.Message): Promise<void> =>
     const isAdmin = admins.some((admin) => admin.user.id === userId);
 
     if (isAdmin) {
-        console.log('handleBindCommand isAdmin');
 
         try {
 

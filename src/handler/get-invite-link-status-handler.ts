@@ -1,6 +1,6 @@
 import { toResponse, unknownErrorResponse } from "../aws/lambda";
 import { telegramCodeRepository } from "../repository/telegram-code-repository";
-import { APIGatewayEvent, APIGatewayProxyResult, Handler } from "aws-lambda";
+import { APIGatewayProxyResult, Handler } from "aws-lambda";
 
 interface GetInviteLinkStatusRequest {
     address: string,
@@ -18,11 +18,10 @@ export enum GetInviteLinkStatusType {
     CODE_USED
 }
 
-export const getInviteLinkStatusHandler: Handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
+export const getInviteLinkStatusHandler: Handler = async (request: GetInviteLinkStatusRequest): Promise<APIGatewayProxyResult> => {
     
     try {
 
-        const request = JSON.parse(event.body!!) as GetInviteLinkStatusRequest;
         const code = await telegramCodeRepository.getByAddressAndSubscriptionId(request.address, request.subscription_id);
         
         if (!code) {
