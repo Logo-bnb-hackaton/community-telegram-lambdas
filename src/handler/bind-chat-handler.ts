@@ -55,7 +55,7 @@ export const bindChatHandler: Handler = async (request: BindChatRequest): Promis
             user_id: telegramCode.user_id,
             address: request.address,
             subscription_id: request.subscription_id,
-            updated_at: unixTimestamp()
+            updated_at: unixTimestamp(),
         }
 
         await telegramCodeRepository.update(updatedTelegramCode);

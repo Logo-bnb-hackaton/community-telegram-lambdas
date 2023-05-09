@@ -10,7 +10,7 @@ import TelegramBot, {Update} from "node-telegram-bot-api";
 
 const token = '5594626655:AAHPrN4jgWeLNuoGsHomF__ggck1kSc4lfU';
 const username = 'sprut_signals_bot';
-const bot = new TelegramBot(token, {polling: false});
+export const bot = new TelegramBot(token, {polling: false});
 
 export const telegramWebhookHandler: Handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
 
@@ -66,6 +66,7 @@ const handleBindCommand = async (message: TelegramBot.Message): Promise<void> =>
                 await bot.sendMessage(chatId, "Can't create binding code because you didn't start a conversation with nodde bot in direct messages.");
                 return;
             }
+            const now = unixTimestamp();
 
             const newBinding: TelegramCode = {
                 code_type: TelegramCodeType.BINDING,
@@ -73,7 +74,8 @@ const handleBindCommand = async (message: TelegramBot.Message): Promise<void> =>
                 chat_id: String(chatId),
                 user_private_chat_id: privateChatInfo.chat_id,
                 user_id: String(userId),
-                created_at: unixTimestamp()
+                created_at: now,
+                updated_at: now,
             }
 
             console.log(`Try to save new binding ${newBinding}`);

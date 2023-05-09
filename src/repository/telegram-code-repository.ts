@@ -1,26 +1,27 @@
 import {documentClient} from "../aws/dynamo"
 import {
+    AttributeValue,
     GetItemCommand,
     GetItemCommandInput,
     PutItemCommand,
     PutItemCommandInput,
     QueryCommand
 } from "@aws-sdk/client-dynamodb"
-import {QueryCommandInput} from "@aws-sdk/lib-dynamodb"
+import {QueryCommandInput, ScanCommand, ScanCommandInput} from "@aws-sdk/lib-dynamodb"
 import {marshall, unmarshall} from "@aws-sdk/util-dynamodb"
 
 export interface TelegramCode {
     code: string,
     chat_id: string,
     created_at: number,
-    updated_at?: number,
+    updated_at?: number | undefined,
     code_type: TelegramCodeType,
-    user_id?: string,
-    address?: string,
-    subscription_id?: string,
-    invite_link?: string,
-    user_private_chat_id?: string,
-    invite_link_refresh_count?: number
+    user_id?: string | undefined,
+    address?: string | undefined,
+    subscription_id?: string | undefined,
+    invite_link?: string | undefined,
+    user_private_chat_id?: string | undefined,
+    invite_link_refresh_count?: number | undefined
 }
 
 export enum TelegramCodeType {
@@ -31,6 +32,8 @@ export enum TelegramCodeType {
 export interface TelegramCodeRepository {
 
     findBindingBySubscriptionId(subscriptionId: string): Promise<TelegramCode | undefined>
+
+    findBindingBySubscriptionIdWithScan(subscriptionId: string): Promise<TelegramCode | undefined>
 
     getByAddressAndSubscriptionId(address: string, subscriptionId: string): Promise<TelegramCode | undefined>
 
@@ -46,6 +49,7 @@ export class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
 
     private table: string = 'telegram-codes';
 
+    // todo fix, not working now
     async findBindingBySubscriptionId(subscriptionId: string): Promise<TelegramCode | undefined> {
 
         console.log(`Start find subscription binding for id ${subscriptionId}`);
@@ -78,6 +82,41 @@ export class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
         console.log(`Found binding for subscription ${subscriptionId}`);
 
         return unmarshall(result.Items[0]) as TelegramCode;
+    }
+
+    async findBindingBySubscriptionIdWithScan(subscriptionId: string): Promise<TelegramCode | undefined> {
+
+        console.log(`Start find subscription binding with scan for id ${subscriptionId}`);
+        const input: ScanCommandInput = {
+            TableName: this.table,
+        };
+
+        const command: ScanCommand = new ScanCommand(input);
+
+        const result = await documentClient.send(command);
+        console.log(`findBindingBySubscriptionIdWithScan result:`);
+        console.log(result);
+
+        if (!result?.Items || result.Items.length === 0) {
+            console.log(`Can't find binding`)
+            return undefined;
+        }
+
+        const items = result.Items
+            .map(i => i as TelegramCode)
+            .filter(item => item.subscription_id === subscriptionId)
+            .filter(item => item.code_type === TelegramCodeType.BINDING)
+            .filter(item => item.chat_id !== undefined);
+
+        console.log(items);
+
+        if (items.length > 1) {
+            throw new Error('Found two binded chats illegal state');
+        }
+
+        console.log(`Found binding for subscription ${subscriptionId}`);
+
+        return items[0];
     }
 
     async getByAddressAndSubscriptionId(address: string, subscriptionId: string): Promise<TelegramCode | undefined> {

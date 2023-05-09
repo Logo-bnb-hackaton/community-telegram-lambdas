@@ -19,7 +19,7 @@ export const generateInviteCodeHandler: Handler = async (request: GenerateInvite
 
         const {address, subscription_id} = request;
 
-        const bindedCode = await telegramCodeRepository.findBindingBySubscriptionId(subscription_id);
+        const bindedCode = await telegramCodeRepository.findBindingBySubscriptionIdWithScan(subscription_id);
 
         if (!bindedCode) {
             console.log(`Cant find binded code for subscription with id ${subscription_id}`);
