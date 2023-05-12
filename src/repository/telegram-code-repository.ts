@@ -121,25 +121,34 @@ export class TelegramCodeRepositoryImpl implements TelegramCodeRepository {
 
     async getByAddressAndSubscriptionId(address: string, subscriptionId: string): Promise<TelegramCode | undefined> {
 
-        const input: GetItemCommandInput = {
-            TableName: this.table,
-            Key: marshall({
-                address: address,
-                subscription_id: subscriptionId
-            })
+        const input: ScanCommandInput = {
+            TableName: this.table
         };
 
-        const command: GetItemCommand = new GetItemCommand(input);
+        const command: ScanCommand = new ScanCommand(input);
 
-        const {Item} = await documentClient.send(command);
-        if (!Item) {
+        const {Items} = await documentClient.send(command);
+        if (!Items) {
+            console.log(`Can't find binding for address ${address} and subscriptionId ${subscriptionId}`);
+            return undefined;
+        }
+        const items = Items.map(i => i as TelegramCode)
+            .filter(code => code.address === address)
+            .filter(code => code.subscription_id === subscriptionId)
+            .filter(code => code.code_type === TelegramCodeType.INVITE);
+
+        if (!items) {
             console.log(`Can't find binding for address ${address} and subscriptionId ${subscriptionId}`);
             return undefined;
         }
 
-        console.log(`Found telegramCode for address ${address} and subscriptionId ${subscriptionId}`);
+        console.log(`Found ${items.length} telegramCode for address ${address} and subscriptionId ${subscriptionId}`);
+        if (items.length > 1) {
+            console.log(`Found ${items.length} invites`);
+            throw new Error(`Found ${items.length} invites`);
+        }
 
-        return unmarshall(Item) as TelegramCode
+        return items[0];
     }
 
     async getByCode(code: string): Promise<TelegramCode | undefined> {

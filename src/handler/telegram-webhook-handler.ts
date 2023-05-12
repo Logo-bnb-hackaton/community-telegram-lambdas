@@ -166,12 +166,11 @@ const handleInviteCode = async (message: TelegramBot.Message): Promise<void> => 
 
         const groupChatId = telegramCode.chat_id;
 
+
         const newInviteLink = await bot.createChatInviteLink(
             groupChatId,
-            undefined,
-            undefined,
-            1,
-            true
+            // @ts-ignore don't touch it, idk why but without brackets it doesn't work
+            {member_limit: 1}
         );
 
         telegramCode.invite_link = newInviteLink.invite_link;
@@ -183,7 +182,7 @@ const handleInviteCode = async (message: TelegramBot.Message): Promise<void> => 
         await telegramCodeRepository.save(telegramCode);
 
         console.log(`Invite link successfully generated for user ${userId} in chat ${privateChatId}`);
-        await bot.sendMessage(privateChatId, `Your invite link here ${newInviteLink}. Don't share it with anyone`);
+        await bot.sendMessage(privateChatId, `Your invite link here ${newInviteLink.invite_link}. Don't share it with anyone`);
 
     } catch (err) {
         console.log(`Error when save infite link for user ${userId} in chat ${privateChatId}`);
