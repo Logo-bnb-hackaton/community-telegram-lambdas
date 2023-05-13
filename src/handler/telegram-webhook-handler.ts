@@ -8,8 +8,8 @@ import {
 import {APIGatewayEvent, APIGatewayProxyResult, Handler} from "aws-lambda";
 import TelegramBot, {Update} from "node-telegram-bot-api";
 
-const token = '5594626655:AAHPrN4jgWeLNuoGsHomF__ggck1kSc4lfU';
-const username = 'sprut_signals_bot';
+const token = '6072448910:AAH939odW2tsXeoPHPIkFFhE09z5K_CAyjo';
+const username = 'nodde_bot';
 export const bot = new TelegramBot(token, {polling: false});
 
 export const telegramWebhookHandler: Handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {
@@ -83,7 +83,7 @@ const handleBindCommand = async (message: TelegramBot.Message): Promise<void> =>
             await telegramCodeRepository.save(newBinding);
 
             console.log(`Binding code successfully created for chat ${newBinding.chat_id}. The code will be send in direct messages chat ${newBinding.user_private_chat_id} to user ${userId}`);
-            await bot.sendMessage(newBinding.user_private_chat_id!!, `Your binding code is ${newBinding.code}. Do not share this with anyone. Use it to bind your Telegram group to your Nodde session. Enjoy!`);
+            await bot.sendMessage(newBinding.user_private_chat_id!!, `Your binding code is ${newBinding.code}. Do not share this with anyone. Use it to bind your Telegram group to the new subscription. Enjoy!`);
 
         } catch (err) {
             await bot.sendMessage(chatId, SOMETHING_WRONG_MESSAGE);
@@ -127,7 +127,7 @@ const handleStartCommand = async (message: TelegramBot.Message): Promise<void> =
 
         await telegramPrivateChatMappingRepository.save(privateChatInfo);
         console.log(`New relation saved successfully, user ${userId} in chat ${chatId}. Send greeting to user`);
-        await bot.sendMessage(chatId, "Hello! If you have invintation code, please send it in the next message. If you an author follow instructions on `Nodde` site.");
+        await bot.sendMessage(chatId, "Hello! If you have an invitation code, please send it in the next message. If you are an author, follow instructions on Nodde site to generate binding code.");
 
     } catch (err) {
         console.log(err);
