@@ -44,4 +44,4 @@ functions:
   generateInviteCode:
     handler: src/handler/generate-invite-code-handler.generateInviteCodeHandler
   getInviteLinkStatus:
-    handler: src/handler/get-chat-binding-status-handler.getChatBindingStatusHandler
+    handler: src/handler/get-invite-link-status-handler.getInviteLinkStatusHandler
